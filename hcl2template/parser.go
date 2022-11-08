@@ -141,6 +141,7 @@ func (p *Parser) Parse(filename string, varFiles []string, argVars map[string]st
 		CorePackerVersionString: p.CorePackerVersionString,
 		HCPVars:                 map[string]cty.Value{},
 		ValidationOptions:       p.ValidationOptions,
+		HCPBuildNames:           map[string]string{},
 		parser:                  p,
 		files:                   files,
 	}
@@ -331,6 +332,17 @@ func (cfg *PackerConfig) Initialize(opts packer.InitializeOptions) hcl.Diagnosti
 	}
 
 	diags = append(diags, cfg.initializeBlocks()...)
+
+	for _, b := range cfg.Builds {
+		for _, bs := range b.Sources {
+			buildName := bs.String()
+			if b.Name != "" {
+				buildName = fmt.Sprintf("%s.%s", b.Name, buildName)
+			}
+
+			cfg.HCPBuildNames[buildName] = bs.String()
+		}
+	}
 
 	return diags
 }

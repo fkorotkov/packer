@@ -2,6 +2,7 @@ package registry
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 
 	"github.com/hashicorp/hcl/v2"
@@ -25,9 +26,23 @@ func NewJSONMetadataRegistry(config *packer.Core) (*JSONMetadataRegistry, hcl.Di
 		return nil, diags
 	}
 
-	for _, b := range config.Template.Builders {
-		// Get all builds slated within config ignoring any only or exclude flags.
-		bucket.RegisterBuildForComponent(packer.HCPName(b))
+	// Get all builds slated within config ignoring any only or exclude flags.
+	for _, b := range config.BuildNames([]string{}, []string{}) {
+		hcpName, err := config.HCPName(b)
+		if err != nil {
+			diags = append(diags, &hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  "No HCP name available",
+				Detail: fmt.Sprintf("Packer failed to get an HCP-compatible "+
+					"build name for builder %q: %s.\nThis is an "+
+					"internal error, which stems from a bug in Packer. "+
+					"Please open a Github issue for the team to look at.",
+					b, err),
+			})
+			continue
+		}
+
+		bucket.RegisterBuildForComponent(hcpName)
 	}
 
 	return &JSONMetadataRegistry{
@@ -57,7 +72,11 @@ func (h *JSONMetadataRegistry) PopulateIteration(ctx context.Context) error {
 
 // StartBuild is invoked when one build for the configuration is starting to be processed
 func (h *JSONMetadataRegistry) StartBuild(ctx context.Context, buildName string) error {
-	return h.bucket.startBuild(ctx, buildName)
+	build, err := h.configuration.HCPName(buildName)
+	if err != nil {
+		return fmt.Errorf("failed to get build %q: %s", buildName, err)
+	}
+	return h.bucket.startBuild(ctx, build)
 }
 
 // CompleteBuild is invoked when one build for the configuration has finished
@@ -67,5 +86,9 @@ func (h *JSONMetadataRegistry) CompleteBuild(
 	artifacts []sdkpacker.Artifact,
 	buildErr error,
 ) ([]sdkpacker.Artifact, error) {
-	return h.bucket.completeBuild(ctx, buildName, artifacts, buildErr)
+	build, err := h.configuration.HCPName(buildName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get build %q: %s", buildName, err)
+	}
+	return h.bucket.completeBuild(ctx, build, artifacts, buildErr)
 }

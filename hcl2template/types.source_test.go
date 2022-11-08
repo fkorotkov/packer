@@ -47,6 +47,9 @@ func TestParse_source(t *testing.T) {
 						Name: "test",
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -66,6 +69,7 @@ func TestParse_source(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "sources"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -77,6 +81,7 @@ func TestParse_source(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "sources"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -92,6 +97,7 @@ func TestParse_source(t *testing.T) {
 				Sources: map[SourceRef]SourceBlock{
 					{Type: "nonexistent", Name: "ubuntu-1204"}: {Type: "nonexistent", Name: "ubuntu-1204"},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -115,6 +121,9 @@ func TestParse_source(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"nonexistent.ubuntu-1204": "nonexistent.ubuntu-1204",
+				},
 			},
 			true, true,
 			nil,
@@ -135,6 +144,7 @@ func TestParse_source(t *testing.T) {
 						Name: "ubuntu-1204",
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			nil,

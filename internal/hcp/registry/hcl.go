@@ -45,7 +45,11 @@ func (h *HCLMetadataRegistry) PopulateIteration(ctx context.Context) error {
 
 // StartBuild is invoked when one build for the configuration is starting to be processed
 func (h *HCLMetadataRegistry) StartBuild(ctx context.Context, buildName string) error {
-	return h.bucket.startBuild(ctx, buildName)
+	build, err := h.configuration.HCPName(buildName)
+	if err != nil {
+		return fmt.Errorf("failed to get build %q: %s", buildName, err)
+	}
+	return h.bucket.startBuild(ctx, build)
 }
 
 // CompleteBuild is invoked when one build for the configuration has finished
@@ -55,7 +59,11 @@ func (h *HCLMetadataRegistry) CompleteBuild(
 	artifacts []sdkpacker.Artifact,
 	buildErr error,
 ) ([]sdkpacker.Artifact, error) {
-	return h.bucket.completeBuild(ctx, buildName, artifacts, buildErr)
+	build, err := h.configuration.HCPName(buildName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get build %q: %s", buildName, err)
+	}
+	return h.bucket.completeBuild(ctx, build, artifacts, buildErr)
 }
 
 func NewHCLMetadataRegistry(config *hcl2template.PackerConfig) (*HCLMetadataRegistry, hcl.Diagnostics) {
@@ -111,8 +119,8 @@ func NewHCLMetadataRegistry(config *hcl2template.PackerConfig) (*HCLMetadataRegi
 		return nil, diags
 	}
 
-	for _, source := range build.Sources {
-		bucket.RegisterBuildForComponent(source.String())
+	for _, build := range config.HCPBuildNames {
+		bucket.RegisterBuildForComponent(build)
 	}
 
 	return &HCLMetadataRegistry{

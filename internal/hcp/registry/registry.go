@@ -27,7 +27,6 @@ func New(cfg packer.Handler) (Registry, hcl.Diagnostics) {
 
 	switch config := cfg.(type) {
 	case *hcl2template.PackerConfig:
-		// Maybe rename to what it represents....
 		return NewHCLMetadataRegistry(config)
 	case *packer.Core:
 		return NewJSONMetadataRegistry(config)

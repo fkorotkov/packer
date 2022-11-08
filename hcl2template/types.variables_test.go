@@ -121,6 +121,9 @@ func TestParse_variables(t *testing.T) {
 						Sensitive: true,
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -150,6 +153,7 @@ func TestParse_variables(t *testing.T) {
 						Type: cty.Bool,
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -171,6 +175,7 @@ func TestParse_variables(t *testing.T) {
 						Type: cty.Bool,
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -194,6 +199,7 @@ func TestParse_variables(t *testing.T) {
 						Name: "sensible",
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -215,6 +221,7 @@ func TestParse_variables(t *testing.T) {
 						Type: cty.List(cty.String),
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -234,6 +241,7 @@ func TestParse_variables(t *testing.T) {
 						Type:   cty.Bool,
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -252,6 +260,7 @@ func TestParse_variables(t *testing.T) {
 						Type: cty.String,
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -284,6 +293,9 @@ func TestParse_variables(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"null.null-builder": "null.null-builder",
 				},
 			},
 			true, true,
@@ -371,6 +383,9 @@ func TestParse_variables(t *testing.T) {
 						}),
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -391,6 +406,7 @@ func TestParse_variables(t *testing.T) {
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "variables"),
 				LocalVariables:          Variables{},
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -434,6 +450,9 @@ func TestParse_variables(t *testing.T) {
 						Type: cty.String,
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -475,6 +494,9 @@ func TestParse_variables(t *testing.T) {
 					},
 				},
 				Basedir: filepath.Join("testdata", "variables"),
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -531,6 +553,9 @@ func TestParse_variables(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"null.null-builder": "null.null-builder",
 				},
 			},
 			false, false,
@@ -619,6 +644,9 @@ func TestParse_variables(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -651,6 +679,7 @@ func TestParse_variables(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			nil,

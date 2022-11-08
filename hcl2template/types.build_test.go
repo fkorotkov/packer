@@ -50,6 +50,10 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"amazon-ebs.ubuntu-1604":     "amazon-ebs.ubuntu-1604",
+					"virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -62,6 +66,7 @@ func TestParse_build(t *testing.T) {
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "build"),
 				Builds:                  nil,
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -99,6 +104,9 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			true, true,
 			[]packersdk.Build{&packer.CoreBuild{
@@ -115,6 +123,7 @@ func TestParse_build(t *testing.T) {
 				Sources: map[SourceRef]SourceBlock{
 					refVBIsoUbuntu1204: {Type: "virtualbox-iso", Name: "ubuntu-1204"},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{&packer.CoreBuild{
@@ -140,6 +149,7 @@ func TestParse_build(t *testing.T) {
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "build"),
 				Builds:                  nil,
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{&packer.CoreBuild{}},
@@ -179,6 +189,9 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			true, true,
 			[]packersdk.Build{&packer.CoreBuild{
@@ -193,6 +206,7 @@ func TestParse_build(t *testing.T) {
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "build"),
 				Builds:                  nil,
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -219,6 +233,10 @@ func TestParse_build(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"somebuild.amazon-ebs.ubuntu-1604":     "amazon-ebs.ubuntu-1604",
+					"somebuild.virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
 				},
 			},
 			true, true,
@@ -274,6 +292,10 @@ func TestParse_build(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"amazon-ebs.aws-ubuntu-16.04": "amazon-ebs.aws-ubuntu-16.04",
+					"virtualbox-iso.ubuntu-1204":  "virtualbox-iso.ubuntu-1204",
 				},
 			},
 			false, false,
@@ -390,6 +412,10 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"amazon-ebs.aws-ubuntu-16.04": "amazon-ebs.aws-ubuntu-16.04",
+					"virtualbox-iso.ubuntu-1204":  "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -479,6 +505,9 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -541,6 +570,9 @@ func TestParse_build(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"build-name.virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -563,6 +595,7 @@ func TestParse_build(t *testing.T) {
 				Basedir:                 filepath.Join("testdata", "build"),
 				InputVariables:          Variables{},
 				Builds:                  nil,
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			[]packersdk.Build{},
@@ -594,6 +627,9 @@ func TestParse_build(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"test-build.virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
 				},
 			},
 			false, false,
@@ -651,6 +687,9 @@ func TestParse_build(t *testing.T) {
 							},
 						},
 					},
+				},
+				HCPBuildNames: map[string]string{
+					"build-name-test.virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
 				},
 			},
 			false, false,

@@ -56,6 +56,9 @@ type PackerConfig struct {
 	// HCPVars is the list of HCP-set variables for use later in a template
 	HCPVars map[string]cty.Value
 
+	// HCPBuildNames maintains a set of HCP aliases from local builds
+	HCPBuildNames map[string]string
+
 	parser *Parser
 	files  []*hcl.File
 
@@ -564,20 +567,17 @@ func (cfg *PackerConfig) getCoreBuildPostProcessors(source SourceUseBlock, block
 // GetBuilds returns a list of packer Build based on the HCL2 parsed build
 // blocks. All Builders, Provisioners and Post Processors will be started and
 // configured.
-func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Build, map[string]string, hcl.Diagnostics) {
+func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Build, hcl.Diagnostics) {
 	res := []packersdk.Build{}
 	var diags hcl.Diagnostics
 	possibleBuildNames := []string{}
-
-	// hcpTranslationMap maps the local name of a Corebuild to its HCP name
-	hcpTranslationMap := map[string]string{}
 
 	cfg.debug = opts.Debug
 	cfg.force = opts.Force
 	cfg.onError = opts.OnError
 
 	if len(cfg.Builds) == 0 {
-		return res, hcpTranslationMap, append(diags, &hcl.Diagnostic{
+		return res, append(diags, &hcl.Diagnostic{
 			Summary:  "Missing build block",
 			Detail:   "A build block with one or more sources is required for executing a build.",
 			Severity: hcl.DiagError,
@@ -602,8 +602,6 @@ func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Bu
 				Type:      srcUsage.String(),
 			}
 
-			hcpTranslationMap[pcb.Name()] = srcUsage.String()
-
 			pcb.SetDebug(cfg.debug)
 			pcb.SetForce(cfg.force)
 			pcb.SetOnError(cfg.onError)
@@ -615,7 +613,7 @@ func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Bu
 			if len(opts.Only) > 0 {
 				onlyGlobs, diags := convertFilterOption(opts.Only, "only")
 				if diags.HasErrors() {
-					return nil, nil, diags
+					return nil, diags
 				}
 				cfg.only = onlyGlobs
 				include := false
@@ -635,7 +633,7 @@ func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Bu
 			if len(opts.Except) > 0 {
 				exceptGlobs, diags := convertFilterOption(opts.Except, "except")
 				if diags.HasErrors() {
-					return nil, nil, diags
+					return nil, diags
 				}
 				cfg.except = exceptGlobs
 				exclude := false
@@ -732,7 +730,24 @@ func (cfg *PackerConfig) GetBuilds(opts packer.GetBuildsOptions) ([]packersdk.Bu
 				"These could also be matched with a glob pattern like: 'happycloud.*'", possibleBuildNames),
 		})
 	}
-	return res, hcpTranslationMap, diags
+
+	return res, diags
+}
+
+// HCPName returns the name for HCP from a local build name
+//
+// Errors if no build can be found or if the hcp names map is uninitialized
+func (cfg *PackerConfig) HCPName(buildName string) (string, error) {
+	if cfg.HCPBuildNames == nil {
+		return "", fmt.Errorf("uninitialized hcp names")
+	}
+
+	nm, ok := cfg.HCPBuildNames[buildName]
+	if !ok {
+		return "", fmt.Errorf("no such build registered: %s", buildName)
+	}
+
+	return nm, nil
 }
 
 var PackerConsoleHelp = strings.TrimSpace(`

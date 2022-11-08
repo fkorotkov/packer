@@ -43,6 +43,9 @@ func Test_ParseHCPPackerRegistryBlock(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -96,6 +99,9 @@ func Test_ParseHCPPackerRegistryBlock(t *testing.T) {
 						},
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"virtualbox-iso.ubuntu-1204": "virtualbox-iso.ubuntu-1204",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -115,6 +121,7 @@ func Test_ParseHCPPackerRegistryBlock(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "hcp_par"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -126,6 +133,7 @@ func Test_ParseHCPPackerRegistryBlock(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "hcp_par"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,

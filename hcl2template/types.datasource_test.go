@@ -49,6 +49,9 @@ func TestParse_datasource(t *testing.T) {
 						Name: "test",
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -126,6 +129,9 @@ func TestParse_datasource(t *testing.T) {
 						Name: "yummy",
 					},
 				},
+				HCPBuildNames: map[string]string{
+					"null.test": "null.test",
+				},
 			},
 			false, false,
 			[]packersdk.Build{
@@ -145,6 +151,7 @@ func TestParse_datasource(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "datasources"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -156,6 +163,7 @@ func TestParse_datasource(t *testing.T) {
 			&PackerConfig{
 				CorePackerVersionString: lockedVersion,
 				Basedir:                 filepath.Join("testdata", "datasources"),
+				HCPBuildNames:           map[string]string{},
 			},
 			true, true,
 			nil,
@@ -176,6 +184,7 @@ func TestParse_datasource(t *testing.T) {
 						Name: "test",
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			nil,
@@ -196,6 +205,7 @@ func TestParse_datasource(t *testing.T) {
 						Name: "test",
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			nil,
@@ -223,6 +233,7 @@ func TestParse_datasource(t *testing.T) {
 						Name: "bear",
 					},
 				},
+				HCPBuildNames: map[string]string{},
 			},
 			true, true,
 			nil,

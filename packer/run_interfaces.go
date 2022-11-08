@@ -21,7 +21,7 @@ type BuildGetter interface {
 	// GetBuilds return all possible builds for a config. It also starts all
 	// builders.
 	// TODO(azr): rename to builder starter ?
-	GetBuilds(GetBuildsOptions) ([]packersdk.Build, map[string]string, hcl.Diagnostics)
+	GetBuilds(GetBuildsOptions) ([]packersdk.Build, hcl.Diagnostics)
 }
 
 type Evaluator interface {
@@ -50,6 +50,7 @@ type Handler interface {
 	BuildGetter
 	ConfigFixer
 	ConfigInspector
+	HCPPublisher
 }
 
 //go:generate enumer -type FixConfigMode
@@ -81,4 +82,11 @@ type InspectConfigOptions struct {
 type ConfigInspector interface {
 	// Inspect will output self inspection for a configuration
 	InspectConfig(InspectConfigOptions) (ret int)
+}
+
+type HCPPublisher interface {
+	// HCPName returns the name for HCP from a local build name
+	//
+	// Errors if no build can be found
+	HCPName(string) (string, error)
 }

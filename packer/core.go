@@ -35,6 +35,9 @@ type Core struct {
 
 	except []string
 	only   []string
+
+	// hcpBuildNames maintains a set of HCP aliases from local builds
+	hcpBuildNames map[string]string
 }
 
 // CoreConfig is the structure for initializing a new Core. Once a CoreConfig
@@ -119,12 +122,13 @@ type ComponentFinder struct {
 // NewCore creates a new Core.
 func NewCore(c *CoreConfig) *Core {
 	core := &Core{
-		Template:   c.Template,
-		components: c.Components,
-		variables:  c.Variables,
-		version:    c.Version,
-		only:       c.Only,
-		except:     c.Except,
+		Template:      c.Template,
+		hcpBuildNames: map[string]string{},
+		components:    c.Components,
+		variables:     c.Variables,
+		version:       c.Version,
+		only:          c.Only,
+		except:        c.Except,
 	}
 	return core
 }
@@ -165,9 +169,27 @@ func (core *Core) initialize() error {
 		}
 
 		core.builds[v] = b
+
+		core.hcpBuildNames[v] = b.Type
+		if b.Type != b.Name {
+			core.hcpBuildNames[v] = fmt.Sprintf("%s.%s", b.Type, b.Name)
+		}
 	}
 
 	return nil
+}
+
+func (core *Core) HCPName(buildName string) (string, error) {
+	if core.hcpBuildNames == nil {
+		return "", fmt.Errorf("uninitialized hcp names")
+	}
+
+	nm, ok := core.hcpBuildNames[buildName]
+	if !ok {
+		return "", fmt.Errorf("no such build registered: %s", buildName)
+	}
+
+	return nm, nil
 }
 
 func (c *Core) PluginRequirements() (plugingetter.Requirements, hcl.Diagnostics) {
@@ -268,10 +290,9 @@ func (c *Core) generateCoreBuildProvisioner(rawP *template.Provisioner, rawName 
 
 // This is used for json templates to launch the build plugins.
 // They will be prepared via b.Prepare() later.
-func (c *Core) GetBuilds(opts GetBuildsOptions) ([]packersdk.Build, map[string]string, hcl.Diagnostics) {
+func (c *Core) GetBuilds(opts GetBuildsOptions) ([]packersdk.Build, hcl.Diagnostics) {
 	buildNames := c.BuildNames(opts.Only, opts.Except)
 	builds := []packersdk.Build{}
-	hcpTranslationMap := map[string]string{}
 	diags := hcl.Diagnostics{}
 	for _, n := range buildNames {
 		b, err := c.Build(n)
@@ -283,8 +304,6 @@ func (c *Core) GetBuilds(opts GetBuildsOptions) ([]packersdk.Build, map[string]s
 			})
 			continue
 		}
-
-		hcpTranslationMap[n] = HCPName(c.builds[n])
 
 		// Now that build plugin has been launched, call Prepare()
 		log.Printf("Preparing build: %s", b.Name())
@@ -315,25 +334,7 @@ func (c *Core) GetBuilds(opts GetBuildsOptions) ([]packersdk.Build, map[string]s
 			}
 		}
 	}
-	return builds, hcpTranslationMap, diags
-}
-
-// HCPName is a helper to get a curated HCP name for a legacy JSON builder.
-//
-// In order to make the naming scheme between HCL2 and JSON more consistent,
-// we implement a similar kind of logic on both template types.
-//
-// This means that when for HCL2 templates we have a build name formed of
-// the source type and the source name, we will do the name here for JSON.
-func HCPName(builder *template.Builder) string {
-	// By default, if the name is unspecified, it will be assigned the type
-	//
-	// No need to repeat ourselves here, so we can keep the current behaviour
-	if builder.Name == builder.Type {
-		return builder.Name
-	}
-
-	return fmt.Sprintf("%s.%s", builder.Type, builder.Name)
+	return builds, diags
 }
 
 // Build returns the Build object for the given name.
